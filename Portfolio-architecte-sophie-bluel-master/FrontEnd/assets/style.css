@@ -187,10 +187,77 @@ footer nav ul {
 }
 
 /* AJOUTS */
+
+/* HOMEPAGE*/
+/* Filtres*/
 .buttonfilter {
 	display: flex;
-	flex-direction : row;
 	position: relative;
-	height: 37px;
-	width: 100px;
+	justify-content: center;
+	margin: 50px 0px 50px 0px;
+}
+
+button {
+	height: 35px;
+	color: #1D6154;
+	border: 1px solid #1D6154;
+	background-color: #FFFF;
+	font-family: 'Syne';
+	border-radius: 60px;
+	font-size: 15px;
+	margin: 0px 5px 0px 5px;
+	padding: 0px 10px 0px 10px;
+	min-width: 90px;
+}
+
+.filterselected {
+	background-color: #1D6154;
+	color: #FFFF;
+}
+
+/* PAGE LOGIN*/
+/* Mot de passe login*/
+#login {
+	width: 50%;
+margin: auto;
+}
+#login > * {
+	text-align: center;
+
+}
+#login h2{
+	margin-bottom: 20px;
+}
+#login form {
+	text-align: left;
+	margin-top:30px;
+	display: flex;
+	flex-direction: column;
+}
+#login input {
+	height: 50px;
+	font-size: 1.2em;
+	border: none;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+#login label {
+	margin: 2em 0 1em 0;
+}
+#login textarea {
+	border: none;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+.password {
+	text-align: center;
+	text-decoration: underline;
+	margin-bottom: 400px ;
+}
+
+/*Lien mdp*/
+a {
+	text-decoration: none;
+	color: initial;
+}
+a:hover {
+	color: #B1663C;
 }
