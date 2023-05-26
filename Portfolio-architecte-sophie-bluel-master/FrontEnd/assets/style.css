@@ -219,7 +219,7 @@ button {
 /* Mot de passe login*/
 #login {
 	width: 50%;
-margin: auto;
+	margin: auto;
 }
 #login > * {
 	text-align: center;
@@ -257,6 +257,7 @@ margin: auto;
 a {
 	text-decoration: none;
 	color: initial;
+	cursor: default;
 }
 a:hover {
 	color: #B1663C;

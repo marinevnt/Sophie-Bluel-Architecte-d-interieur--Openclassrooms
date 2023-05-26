@@ -1,5 +1,9 @@
 //Recover photos
+const loginUrl = "login.html";
 const galleryApi = document.querySelector(".gallery");
+
+//const loginSelected = document.getElementsByTagName('a')[0];
+const loginSelected = document.getElementById('buttonlogin');
 
 function displayProject(title, imageUrl, filter)
 {
@@ -39,7 +43,7 @@ function addFilters(filtersName)
         const buttonFilter = document.createElement("button");
         buttonDiv.appendChild(buttonFilter);
 
-        //Adding texte inside the bouton 
+        //Adding text inside the bouton 
         buttonFilter.innerText = buttonText;
 
         //Adding filter on the main button
@@ -48,14 +52,15 @@ function addFilters(filtersName)
             buttonFilter.classList.add('filterselected');
         }
 
+        const projectPlace = document.querySelector('.gallery');
         //Adding click and sort
-        const projectsToHide = document.querySelectorAll('figure');
+        const projectsToHide = projectPlace.querySelectorAll('figure');
 
         buttonText = buttonText.replace(/\s+/g, '').replace("&", "");
 
         let projectsToShow;
         if (buttonText === 'Tous') {
-            projectsToShow = document.querySelectorAll('figure');
+            projectsToShow = projectPlace.querySelectorAll('figure');
         }
         else {
             projectsToShow = document.querySelectorAll("." + buttonText);
@@ -68,12 +73,12 @@ function addFilters(filtersName)
             {
                 allButtons[l].classList.remove('filterselected');
             }
-
+            console.log(projectsToHide);
             for(let j = 0; j < projectsToHide.length; j++)
             {
                 projectsToHide[j].style.display = "none";
             }
-
+            console.log(projectsToShow);
             for(let k = 0; k < projectsToShow.length; k++)
             {
                 projectsToShow[k].style.display = "block";
@@ -82,6 +87,34 @@ function addFilters(filtersName)
         });
     }
 }
+
+//Display login or logout
+function isLogged() 
+{
+    const token = localStorage.getItem("token");
+    console.log(token);
+    const logged = Boolean(token);
+ 
+    if (logged) {
+        loginSelected.innerText = 'logout';
+    }
+    else {
+        loginSelected.innerText = 'login';
+    }
+};
+
+isLogged();
+
+loginSelected.addEventListener('click', () => {
+    if (loginSelected.innerText === 'logout') {
+        localStorage.removeItem("token");
+        isLogged();
+    }
+    else
+    {
+        window.location.href = loginUrl;
+    }
+});
 
 fetch("http://localhost:5678/api/works")
 .then (function(response) { 
@@ -99,5 +132,7 @@ fetch("http://localhost:5678/api/works")
     uniqueFilter.unshift("Tous");
 
     addFilters(uniqueFilter);
-
+})
+.catch(function(error) {
+    console.log(error)
 });
