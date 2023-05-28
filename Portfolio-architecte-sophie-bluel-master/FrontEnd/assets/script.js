@@ -5,6 +5,9 @@ const galleryApi = document.querySelector(".gallery");
 //const loginSelected = document.getElementsByTagName('a')[0];
 const loginSelected = document.getElementById('buttonlogin');
 
+//The user is not logged yet
+let userLogged = false;
+
 function displayProject(title, imageUrl, filter)
 {
     // Create HTML element
@@ -88,16 +91,35 @@ function addFilters(filtersName)
     }
 }
 
+//Remove filters when login
+function displayFilters(showFilters)
+{
+    const hideFilters = document.querySelector('.buttonfilter');
+
+    if(showFilters)
+    {
+        hideFilters.style.display = "flex";
+    }
+    else
+    {
+        hideFilters.style.display = "none";
+    }
+}
+
+//Add 
+
 //Display login or logout
 function isLogged() 
 {
     const token = localStorage.getItem("token");
-    console.log(token);
-    const logged = Boolean(token);
+
+    userLogged = Boolean(token); //If undefined, null return false, else return true
  
-    if (logged) {
+    //if connected, write logout
+    if (userLogged) {
         loginSelected.innerText = 'logout';
     }
+    //if deconnected, write login
     else {
         loginSelected.innerText = 'login';
     }
@@ -105,10 +127,12 @@ function isLogged()
 
 isLogged();
 
+//AddEventListener to remove the token and deconect 
 loginSelected.addEventListener('click', () => {
     if (loginSelected.innerText === 'logout') {
         localStorage.removeItem("token");
         isLogged();
+        displayFilters(true);
     }
     else
     {
@@ -132,6 +156,7 @@ fetch("http://localhost:5678/api/works")
     uniqueFilter.unshift("Tous");
 
     addFilters(uniqueFilter);
+    displayFilters(!userLogged); 
 })
 .catch(function(error) {
     console.log(error)
