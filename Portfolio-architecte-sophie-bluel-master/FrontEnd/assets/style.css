@@ -283,7 +283,7 @@ a:hover {
     border-radius: 5px;
     width: 600px;
 	max-height: 80%;
-    padding: 100px 60px;
+    padding: 60px 100px;
     position: relative;
 	overflow-y: scroll;
 }
@@ -292,9 +292,12 @@ h3 {
 	font-size: 26px;
     font-weight: 400;
 	color: black;
+	margin-bottom: 40px;
 }
 hr {
     border: 1px solid #B3B3B3;
+	margin-top: 50px;
+	margin-bottom: 40px;
 }
 .submit_gallery {
     display: flex;
@@ -310,6 +313,7 @@ hr {
 .button_delete {
 	color: #D65353;
     border: none;
+	margin-top: 20px;
 }
 .js-modal-close {
 	position: absolute;
@@ -318,14 +322,33 @@ hr {
 	border: none;
 	color: black;
 }
-
 .modal_content .gallery {
 	width: 100%;
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+	grid-column-gap: 7px;
+	grid-row-gap: 7px;
 }
-
 .modal_content figure {
+	position: relative;
 	font-size: 12px;
 	color: black;
 	font-family: 'Work Sans';
+}
+.button_trash {
+	position: absolute;
+    top: 10px;
+    right: 0px;
+    min-width: 17px;
+    border-radius: 2px;
+    padding: 2px;
+    height: 17px;
+    border:none;
+    background-color: black;
+}
+.button_trash i {
+	font-weight: 900;
+    font-size: 9px;
+    color: white;
+    vertical-align: middle;
+    padding-bottom: 7px;
 }

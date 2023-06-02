@@ -143,7 +143,7 @@ loginSelected.addEventListener('click', () => {
 });
 
 //Add the modale 
-function modale() 
+function createModale() 
 {
     //Add the button "modifier"
     const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
@@ -177,6 +177,7 @@ function modale()
 
     const galleryModal = document.createElement('div');
     galleryModal.classList.add("gallery");
+    galleryModal.classList.add("gallery_modal");
     modalTitle.insertAdjacentElement('afterend',galleryModal);
 
     const hr = document.createElement('hr');
@@ -204,8 +205,6 @@ function modale()
         modal.addEventListener('click', closeModal);
         modal.querySelector('.js-modal-close').addEventListener('click', closeModal);
         modal.querySelector('.js-modal-stop').addEventListener('click', stopPropagation);
-        console.log("OPEN");
-        console.log(modal);
     };
     const closeModal = function (e) {
         e.preventDefault();
@@ -223,8 +222,29 @@ function modale()
         a.addEventListener('click', openModal);
     });
 }
+createModale();
 
-modale();
+function updateModale() 
+{
+    const figuresInGalleryModal = document.querySelector('.gallery_modal').getElementsByTagName('figure');
+    
+    console.log(figuresInGalleryModal);
+
+    for(let i = 0; i < figuresInGalleryModal.length; i++)
+    {
+        //Add the icone trash
+        const buttonTrash = document.createElement('button');
+        buttonTrash.classList.add('button_trash')
+        const iconTrash = document.createElement('i');
+        iconTrash.classList.add('fa-solid');
+        iconTrash.classList.add('fa-trash-can');
+        buttonTrash.appendChild(iconTrash);
+        console.log(buttonTrash);
+
+        const figure = figuresInGalleryModal[i];
+        figure.insertAdjacentElement('beforeend', buttonTrash); 
+    }
+}
 
 fetch("http://localhost:5678/api/works")
 .then (function(response) { 
@@ -243,6 +263,7 @@ fetch("http://localhost:5678/api/works")
 
     addFilters(uniqueFilter);
     displayFilters(!userLogged); 
+    updateModale();
 })
 .catch(function(error) {
     console.log(error)
