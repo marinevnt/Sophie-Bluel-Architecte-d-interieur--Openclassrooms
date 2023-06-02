@@ -227,8 +227,7 @@ createModale();
 function updateModale() 
 {
     const figuresInGalleryModal = document.querySelector('.gallery_modal').getElementsByTagName('figure');
-    
-    console.log(figuresInGalleryModal);
+    const textGalleryModale = document.querySelector('.gallery_modal').getElementsByTagName('figcaption');
 
     for(let i = 0; i < figuresInGalleryModal.length; i++)
     {
@@ -236,13 +235,17 @@ function updateModale()
         const buttonTrash = document.createElement('button');
         buttonTrash.classList.add('button_trash')
         const iconTrash = document.createElement('i');
-        iconTrash.classList.add('fa-solid');
+        iconTrash.classList.add('fa-regular');
         iconTrash.classList.add('fa-trash-can');
         buttonTrash.appendChild(iconTrash);
-        console.log(buttonTrash);
 
         const figure = figuresInGalleryModal[i];
         figure.insertAdjacentElement('beforeend', buttonTrash); 
+    }
+    //Change the image text width "éditer"
+    for(let i = 0; i < textGalleryModale.length; i++)
+    {
+        textGalleryModale[i].textContent = 'éditer';
     }
 }
 

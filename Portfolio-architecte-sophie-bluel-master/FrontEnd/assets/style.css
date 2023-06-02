@@ -330,25 +330,27 @@ hr {
 }
 .modal_content figure {
 	position: relative;
+	font-weight: 400;
 	font-size: 12px;
 	color: black;
 	font-family: 'Work Sans';
+	text-align: initial;
 }
 .button_trash {
 	position: absolute;
     top: 10px;
     right: 0px;
-    min-width: 17px;
+    min-width: 20px;
     border-radius: 2px;
     padding: 2px;
-    height: 17px;
+    height: 20px;
     border:none;
     background-color: black;
 }
 .button_trash i {
 	font-weight: 900;
-    font-size: 9px;
+    font-size: 10px;
     color: white;
     vertical-align: middle;
-    padding-bottom: 7px;
+    padding-bottom: 6px;
 }
