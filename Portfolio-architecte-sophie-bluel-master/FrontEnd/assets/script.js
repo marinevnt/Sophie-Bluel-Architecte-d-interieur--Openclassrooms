@@ -95,18 +95,22 @@ function addFilters(filtersName)
     }
 }
 
-//Remove filters when login
-function displayFilters(showFilters)
+//Remove filters when login and add modal
+function adminMode(isAdmin)
 {
     const hideFilters = document.querySelector('.buttonfilter');
+    const displayModal = document.querySelector('.js-modal')
 
-    if(showFilters)
+    if(isAdmin)
     {
         hideFilters.style.display = "flex";
+        displayModal.style.display = "none";
+
     }
     else
     {
         hideFilters.style.display = "none";
+        displayModal.style.display = "inline";
     }
 }
 
@@ -134,7 +138,7 @@ loginSelected.addEventListener('click', () => {
     if (loginSelected.innerText === 'logout') {
         localStorage.removeItem("token");
         isLogged();
-        displayFilters(true);
+        adminMode(true);
     }
     else
     {
@@ -265,7 +269,7 @@ fetch("http://localhost:5678/api/works")
     uniqueFilter.unshift("Tous");
 
     addFilters(uniqueFilter);
-    displayFilters(!userLogged); 
+    adminMode(!userLogged); 
     updateModale();
 })
 .catch(function(error) {
