@@ -59,7 +59,7 @@ function addFilters(filtersName)
             buttonFilter.classList.add('filterselected');
         }
 
-        const projectPlace = document.querySelector('.gallery');
+        const projectPlace = document.querySelectorAll('.gallery')[1];
         //Adding click and sort
         const projectsToHide = projectPlace.querySelectorAll('figure');
 
@@ -80,16 +80,17 @@ function addFilters(filtersName)
             {
                 allButtons[l].classList.remove('filterselected');
             }
-            console.log(projectsToHide);
+            
             for(let j = 0; j < projectsToHide.length; j++)
             {
                 projectsToHide[j].style.display = "none";
             }
-            console.log(projectsToShow);
+            
             for(let k = 0; k < projectsToShow.length; k++)
             {
                 projectsToShow[k].style.display = "block";
             }
+            
             buttonFilter.classList.add('filterselected');
         });
     }
@@ -152,9 +153,16 @@ function createModale()
     //Add the button "modifier"
     const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
     const buttonModify = document.createElement('a');
+    const buttonModifyElements = document.createElement('i');
+    buttonModifyElements.classList.add('fa-regular');
+    buttonModifyElements.classList.add('fa-pen-to-square');
+    buttonModify.appendChild(buttonModifyElements);
     buttonModify.href = '#modal-gallery';
     buttonModify.classList.add('js-modal');
-    buttonModify.innerText = 'modifier';
+    const buttonModifyText = document.createElement('p');
+    buttonModifyText.innerText = 'modifier';
+    buttonModifyElements.appendChild(buttonModifyText);
+    //buttonModifyElements.innerText = 'modifier';
     editGallery.insertAdjacentElement('beforeend', buttonModify);
 
     //Add the modal
@@ -203,9 +211,8 @@ function createModale()
 
     const openModal = function (e) {
         e.preventDefault();
-        const target = document.querySelector(e.target.getAttribute('href'));
-        target.style.display = null;
-        modal = target;
+        modal = document.querySelector(document.querySelector('.js-modal').getAttribute('href'));
+        modal.style.display = null;
         modal.addEventListener('click', closeModal);
         modal.querySelector('.js-modal-close').addEventListener('click', closeModal);
         modal.querySelector('.js-modal-stop').addEventListener('click', stopPropagation);
@@ -214,14 +221,14 @@ function createModale()
         e.preventDefault();
         modal.style.display = 'none';
         modal.removeEventListener('click', closeModal);
-        modal = null;
         modal.querySelector('.js-modal-close').removeEventListener('click', closeModal);
         modal.querySelector('.js-modal-stop').removeEventListener('click', stopPropagation);
-        console.log("CLOSE");
+        modal = null;
     }
     const stopPropagation = function (e) {
         e.stopPropagation();
     }
+
     document.querySelectorAll('.js-modal').forEach(a => {
         a.addEventListener('click', openModal);
     });

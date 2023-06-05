@@ -267,6 +267,14 @@ a:hover {
 #portfolio a {
 	font-size: 14px;
 }
+.js-modal i {
+	display: inline-flex;
+	margin-left: 30px;
+}
+.js-modal p {
+	font-family: 'Work Sans';
+	margin-left: 10px;
+}
 .modal {
     position: fixed;
     display: flex;
