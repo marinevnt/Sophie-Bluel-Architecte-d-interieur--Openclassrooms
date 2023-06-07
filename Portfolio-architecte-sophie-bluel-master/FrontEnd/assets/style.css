@@ -275,6 +275,15 @@ a:hover {
 	font-family: 'Work Sans';
 	margin-left: 10px;
 }
+#image_presentation img {
+	margin-bottom: 15px;
+}
+#image_presentation a {
+	margin-left: 27px;
+}
+#text_presentation a {
+	margin-left: -27px;
+}
 .modal {
     position: fixed;
     display: flex;
@@ -361,4 +370,40 @@ hr {
     color: white;
     vertical-align: middle;
     padding-bottom: 6px;
+}
+
+/*Bannière noire*/
+.banner {
+	display: flex;
+	width: 100vw;
+	height: 60px;
+	margin-left: calc(-1 * ((100vw - 100%) / 2));
+	background-color: black;
+}
+.banner_content {
+	display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+}
+.button_edition {
+	color: white; 
+	background-color: black;
+	border: none;
+}
+.button_edition i {
+	display: flex;
+    justify-content: center;
+}
+.button_edition p {
+	font-family: 'Work Sans';
+	font-size: 14px;
+	margin-left: 12px;
+}
+.button_publication {
+	font-family: 'Work Sans';
+    border: none;
+    font-size: 14px;
+    color: black;
+    width: 220px;
 }

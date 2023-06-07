@@ -1,13 +1,13 @@
+let token;
 //Recover photos
 const loginUrl = "login.html";
 
-//const loginSelected = document.getElementsByTagName('a')[0];
 const loginSelected = document.getElementById('buttonlogin');
 
 //The user is not logged yet
 let userLogged = false;
 
-function displayProject(title, imageUrl, filter)
+function displayProject(title, imageUrl, filter, id)
 {
     const galleryApi = document.querySelectorAll(".gallery");
 
@@ -20,6 +20,10 @@ function displayProject(title, imageUrl, filter)
         //Create class for figures 
         filter = filter.replace(/\s+/g, '').replace("&", "");
         figure.classList.add(filter);
+
+        //Create id for figures
+        figure.classList.add("figure" + id);
+        console.log(figure);
 
         // Create hierarchy
         figure.appendChild(image);
@@ -59,7 +63,9 @@ function addFilters(filtersName)
             buttonFilter.classList.add('filterselected');
         }
 
-        const projectPlace = document.querySelectorAll('.gallery')[1];
+        //const projectPlace = document.querySelectorAll('.gallery')[1];
+        const projectPlace = document.getElementById('gallery_home');
+
         //Adding click and sort
         const projectsToHide = projectPlace.querySelectorAll('figure');
 
@@ -100,25 +106,27 @@ function addFilters(filtersName)
 function adminMode(isAdmin)
 {
     const hideFilters = document.querySelector('.buttonfilter');
-    const displayModal = document.querySelector('.js-modal')
+    const displayModal = document.querySelectorAll('.js-modal');
+    const bodyBanner = document.querySelector('.banner');
 
     if(isAdmin)
     {
         hideFilters.style.display = "flex";
-        displayModal.style.display = "none";
-
+        displayModal.forEach(modal => {modal.style.display = "none"});
+        bodyBanner.style.display = "none";
     }
     else
     {
         hideFilters.style.display = "none";
-        displayModal.style.display = "inline";
+        displayModal.forEach(modal => {modal.style.display = "inline"});
+        bodyBanner.style.display = "flex";
     }
 }
 
 //Display login or logout
 function isLogged() 
 {
-    const token = localStorage.getItem("token");
+    token = localStorage.getItem("token");
 
     userLogged = Boolean(token); //If undefined, null return false, else return true
  
@@ -153,58 +161,59 @@ function createModale()
     //Add the button "modifier"
     const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
     const buttonModify = document.createElement('a');
-    const buttonModifyElements = document.createElement('i');
-    buttonModifyElements.classList.add('fa-regular');
-    buttonModifyElements.classList.add('fa-pen-to-square');
-    buttonModify.appendChild(buttonModifyElements);
-    buttonModify.href = '#modal-gallery';
-    buttonModify.classList.add('js-modal');
-    const buttonModifyText = document.createElement('p');
-    buttonModifyText.innerText = 'modifier';
-    buttonModifyElements.appendChild(buttonModifyText);
-    //buttonModifyElements.innerText = 'modifier';
-    editGallery.insertAdjacentElement('beforeend', buttonModify);
+    editGallery.appendChild(buttonModify);
 
-    //Add the modal
+    buttonModify.outerHTML = `
+        <a href= "#modal-gallery" class = "js-modal">
+            <i class= "fa-regular fa-pen-to-square">
+                <p>modifier</p>
+            </i>
+        </a> 
+    `;
+    
+    const imagePresentationGallery = document.getElementById('image_presentation');
+    const modifyImagePresentation = document.createElement('a');
+    imagePresentationGallery.appendChild(modifyImagePresentation);
+
+    modifyImagePresentation.outerHTML = `
+    <a href= "#modal-gallery" class = "js-modal">
+            <i class= "fa-regular fa-pen-to-square">
+                <p>modifier</p>
+            </i>
+        </a> 
+    `;
+
+    const textPresentationGallery = document.getElementById('text_presentation');
+    const modifyTextPresentation = document.createElement('a');
+    textPresentationGallery.insertAdjacentElement('afterbegin', modifyTextPresentation);
+
+    modifyTextPresentation.outerHTML = `
+    <a href= "#modal-gallery" class = "js-modal">
+            <i class= "fa-regular fa-pen-to-square">
+                <p>modifier</p>
+            </i>
+        </a> 
+    `;
+
+    //Add the modal content
     const displayModal = document.createElement('aside');
     displayModal.setAttribute('id', 'modal-gallery');
     displayModal.classList.add("modal");
     displayModal.style.display ='none';
-    const modalContent = document.createElement('div');
-    modalContent.classList.add('modal_content');
-    modalContent.classList.add('js-modal-stop');
-    buttonModify.insertAdjacentElement('afterend', displayModal);
-    displayModal.insertAdjacentElement('beforeend', modalContent);
 
-    //Add the button to close the modal
-    const buttonCloseModal = document.createElement('button');
-    buttonCloseModal.classList.add('js-modal-close');
-    modalContent.insertAdjacentElement('beforeend', buttonCloseModal);
-    buttonCloseModal.innerText = 'X';
-
-    //Add the modal content
-    const modalTitle = document.createElement('h3');
-    modalTitle.innerText = 'Galerie photo';
-    modalContent.insertAdjacentElement('beforeend', modalTitle);
-
-    const galleryModal = document.createElement('div');
-    galleryModal.classList.add("gallery");
-    galleryModal.classList.add("gallery_modal");
-    modalTitle.insertAdjacentElement('afterend',galleryModal);
-
-    const hr = document.createElement('hr');
-    galleryModal.insertAdjacentElement('afterend',hr );
-    const divButtons = document.createElement('div');
-    divButtons.classList.add('submit_gallery');
-    hr.insertAdjacentElement('afterend', divButtons);
-    const buttonAddPhoto = document.createElement('button');
-    buttonAddPhoto.innerText = 'Ajouter une photo';
-    buttonAddPhoto.classList.add('button_add-photo')
-    divButtons.insertAdjacentElement('beforeend', buttonAddPhoto);
-    const buttonDeleteGallery = document.createElement('button');
-    buttonDeleteGallery.innerText = 'Supprimer la galerie';
-    buttonDeleteGallery.classList.add('button_delete');
-    buttonAddPhoto.insertAdjacentElement('afterend', buttonDeleteGallery);
+    displayModal.innerHTML = `
+    <div class=" modal_content js-modal-stop">
+        <button class= "js-modal-close">X</button> 
+        <h3>Galerie photo</h3>
+        <div class= "gallery gallery_modal"></div>
+        <hr>
+        <div class= "submit_gallery">
+            <button class= "button_add-photo">Ajouter une photo</button>
+            <button class= "button_delete">Supprimer la galerie</button>
+        </div>
+    </div>
+    `;
+    editGallery.appendChild(displayModal);
 
     //Opening and closing modal function
     let modal = null;
@@ -235,6 +244,26 @@ function createModale()
 }
 createModale();
 
+//Add the black banner when connected
+function topBanner() {
+    const bannerPosition = document.querySelector('body');
+    const banner = document.createElement('div');
+    bannerPosition.insertAdjacentElement('afterbegin', banner);
+    banner.outerHTML = `
+    <div class= "banner">
+        <div class= "banner_content">
+            <button class= "button_edition"> 
+                <i class= "fa-regular fa-pen-to-square">
+                    <p>Mode édition</p>
+                </i>
+            </button>
+            <button class= "button_publication">publier les changements</button>
+        </div>
+    </div>
+    `;
+}
+topBanner();
+
 function updateModale() 
 {
     const figuresInGalleryModal = document.querySelector('.gallery_modal').getElementsByTagName('figure');
@@ -260,6 +289,65 @@ function updateModale()
     }
 }
 
+//Delete image when clic on trash
+function modifyImages(ids) {
+    const trashes = document.querySelectorAll('.button_trash');
+    const deleteAll = document.querySelector('.button_delete');
+
+    for (let i = 0; i < trashes.length; i++) {
+        let trash = trashes[i];
+        let imageId = ids[i];  
+
+        trash.addEventListener('click', event => {
+            // Request DELETE to the API
+            fetch(`http://localhost:5678/api/works/${imageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    // Remove the project from the gallery
+                    let figures = document.querySelectorAll(".figure" + imageId);
+                    figures.forEach(figure => figure.remove());
+                } else {
+                    console.error('Erreur lors de la suppression')
+                }
+            })
+            .catch(function(error) {
+                // Erreur lors de la requête
+                console.log('Erreur lors de la requête DELETE', error);
+            });
+        });
+    }
+    deleteAll.addEventListener('click', event => {
+        for(let i = 0; i < ids.length; i++)
+        {
+            let imageId = ids[i];
+
+            // Request DELETE to the API
+            fetch(`http://localhost:5678/api/works/${imageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .catch(function(error) {
+                // Erreur lors de la requête
+                console.log('Erreur lors de la requête DELETE', error);
+            });
+        }
+
+        // Remove all the project from the gallery
+        let figures = document.getElementById('portfolio').querySelectorAll('figure');
+        for (let i = 0; i < figures.length; i++) 
+        {
+            figures[i].remove();
+        }
+    });
+}
+
 fetch("http://localhost:5678/api/works")
 .then (function(response) { 
     return response.json();
@@ -267,7 +355,7 @@ fetch("http://localhost:5678/api/works")
 .then(function(json) {
     for (let object of json) 
     {
-        displayProject(object.title, object.imageUrl, object.category.name);
+        displayProject(object.title, object.imageUrl, object.category.name, object.id);
     }
 
     let namesFilter = json.map(object => object.category.name); //Return the value of filters's name as a list
@@ -275,9 +363,12 @@ fetch("http://localhost:5678/api/works")
     let uniqueFilter = Array.from(new Set(namesFilter)); //Sort and store unique values ​​+ return an array
     uniqueFilter.unshift("Tous");
 
+    let imagesId = json.map(image => image.id); //Return the value of id's images
+
     addFilters(uniqueFilter);
     adminMode(!userLogged); 
     updateModale();
+    modifyImages(imagesId);
 })
 .catch(function(error) {
     console.log(error)
