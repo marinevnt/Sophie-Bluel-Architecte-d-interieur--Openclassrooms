@@ -322,28 +322,30 @@ function modifyImages(ids) {
         });
     }
     deleteAll.addEventListener('click', event => {
-        for(let i = 0; i < ids.length; i++)
-        {
-            let imageId = ids[i];
+        if (confirm("Êtes-vous sûr de vouloir supprimer toutes les images ?")) {
+            for(let i = 0; i < ids.length; i++)
+            {
+                let imageId = ids[i];
 
-            // Request DELETE to the API
-            fetch(`http://localhost:5678/api/works/${imageId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .catch(function(error) {
-                // Erreur lors de la requête
-                console.log('Erreur lors de la requête DELETE', error);
-            });
-        }
+                // Request DELETE to the API
+                fetch(`http://localhost:5678/api/works/${imageId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .catch(function(error) {
+                    // Erreur lors de la requête
+                    console.log('Erreur lors de la requête DELETE', error);
+                });
+            }
 
-        // Remove all the project from the gallery
-        let figures = document.getElementById('portfolio').querySelectorAll('figure');
-        for (let i = 0; i < figures.length; i++) 
-        {
-            figures[i].remove();
+            // Remove all the project from the gallery
+            let figures = document.getElementById('portfolio').querySelectorAll('figure');
+            for (let i = 0; i < figures.length; i++) 
+            {
+                figures[i].remove();
+            }
         }
     });
 }
