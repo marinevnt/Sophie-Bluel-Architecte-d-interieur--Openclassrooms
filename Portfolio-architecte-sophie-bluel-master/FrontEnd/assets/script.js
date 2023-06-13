@@ -23,7 +23,6 @@ function displayProject(title, imageUrl, filter, id)
 
         //Create id for figures
         figure.classList.add("figure" + id);
-        console.log(figure);
 
         // Create hierarchy
         figure.appendChild(image);
@@ -78,7 +77,6 @@ function addFilters(filtersName)
         else {
             projectsToShow = document.querySelectorAll("." + buttonText);
         }
-
 
         buttonFilter.addEventListener('click', function () {
             const allButtons = document.querySelectorAll('.buttonfilter button');
@@ -241,6 +239,89 @@ function createModale()
     document.querySelectorAll('.js-modal').forEach(a => {
         a.addEventListener('click', openModal);
     });
+
+    //Open the second modal to add photos
+    const addPhoto = document.querySelector('.button_add-photo');
+    addPhoto.addEventListener('click', () => {
+        const reachModalContent = document.querySelector('.modal_content');
+        while (reachModalContent.firstChild) {
+            reachModalContent.firstChild.remove();
+        }
+        reachModalContent.innerHTML = `
+        <button class= "js-arrow"><i class= "fa-solid fa-arrow-left"></i></button>
+        <button class= "js-modal-close">X</button> 
+        <h3>Ajout photo</h3>
+        <form class= "modal-addPhoto">
+            <div class="photo-location">
+                <i class="fa-regular fa-image"></i>
+                <input type="file" id="photoInput" accept="image/jpeg, image/png" style="display: none">
+                <label id="select-photo">+ Ajouter photo</label>
+                <p>jpg, png : 4mo max</p>
+            </div>
+            <label for="title">Titre</label>
+            <input type="text" id="title"></input>
+            <label for="categories">Catégorie</label>
+            <select name="categories" id="categories">
+                <option value="option">objets</option>
+                <option value="option">appartements</option>
+                <option value="option">hotelrestaurants</option>
+            </select>
+        </form>
+        <hr>
+        <button class="button_validation-photo">Valider</button>
+    </div>
+        `;
+    modal.querySelector('.js-modal-close').addEventListener('click', closeModal); 
+
+    //Clic on arrow the reach the photo gallery modal
+    const arrow = document.querySelector('.js-arrow').addEventListener('click',() => {
+    const modalGallery = document.querySelector('.modal_content');
+    while (modalGallery.firstChild) {
+        modalGallery.firstChild.remove();
+    }
+    modalGallery.outerHTML = `
+    <div class=" modal_content js-modal-stop">
+        <button class= "js-modal-close">X</button> 
+        <h3>Galerie photo</h3>
+        <div class= "gallery gallery_modal"></div>
+        <hr>
+        <div class= "submit_gallery">
+            <button class= "button_add-photo">Ajouter une photo</button>
+            <button class= "button_delete">Supprimer la galerie</button>
+        </div>
+    </div>
+    `;
+    }); 
+
+    //Open the files to reach images on clic on the button
+    const selectPhoto = document.getElementById('select-photo');
+    selectPhoto.addEventListener('click', () => {
+        const photoInput = document.getElementById('photoInput');
+        photoInput.click();
+    });
+    const photoInput = document.getElementById('photoInput');
+    photoInput.addEventListener('change', function() {
+        const file = photoInput.files[0];
+        const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const imageSrc = e.target.result;   //content of the file
+        displayImage(imageSrc);
+    };
+
+    reader.readAsDataURL(file);
+    });
+
+    function displayImage(imageSrc) {
+        const newPhoto = document.querySelector('.photo-location');
+        while (newPhoto.firstChild) {
+            newPhoto.firstChild.remove();
+        }
+        const imageElement = document.createElement('img');
+        imageElement.src = imageSrc;
+        newPhoto.appendChild(imageElement);
+    }
+    })
 }
 createModale();
 
@@ -272,15 +353,15 @@ function updateModale()
     for(let i = 0; i < figuresInGalleryModal.length; i++)
     {
         //Add the icone trash
-        const buttonTrash = document.createElement('button');
-        buttonTrash.classList.add('button_trash')
-        const iconTrash = document.createElement('i');
-        iconTrash.classList.add('fa-regular');
-        iconTrash.classList.add('fa-trash-can');
-        buttonTrash.appendChild(iconTrash);
-
         const figure = figuresInGalleryModal[i];
-        figure.insertAdjacentElement('beforeend', buttonTrash); 
+        const buttonTrash = document.createElement('button');
+        
+        figure.insertAdjacentElement('beforeend', buttonTrash);
+        buttonTrash.outerHTML =`
+        <button class= 'button_trash'>
+            <i class= 'fa-regular fa-trash-can'></i>
+        </button>
+        `;
     }
     //Change the image text width "éditer"
     for(let i = 0; i < textGalleryModale.length; i++)
@@ -298,6 +379,7 @@ function modifyImages(ids) {
         let trash = trashes[i];
         let imageId = ids[i];  
 
+        console.log(token);
         trash.addEventListener('click', event => {
             // Request DELETE to the API
             fetch(`http://localhost:5678/api/works/${imageId}`, {
@@ -309,8 +391,8 @@ function modifyImages(ids) {
             .then(function(response) {
                 if (response.ok) {
                     // Remove the project from the gallery
-                    let figures = document.querySelectorAll(".figure" + imageId);
-                    figures.forEach(figure => figure.remove());
+                    let figure = document.querySelector(".figure" + imageId);
+                    figure.remove();
                 } else {
                     console.error('Erreur lors de la suppression')
                 }
@@ -334,17 +416,18 @@ function modifyImages(ids) {
                         'Authorization': `Bearer ${token}`
                     }
                 })
+                .then(function(response) {
+                    // Remove all the project from the gallery
+                    let figures = document.getElementById('portfolio').querySelectorAll('figure');
+                    for (let i = 0; i < figures.length; i++)
+                    {
+                        figures[i].remove();
+                    }
+                })
                 .catch(function(error) {
                     // Erreur lors de la requête
                     console.log('Erreur lors de la requête DELETE', error);
                 });
-            }
-
-            // Remove all the project from the gallery
-            let figures = document.getElementById('portfolio').querySelectorAll('figure');
-            for (let i = 0; i < figures.length; i++) 
-            {
-                figures[i].remove();
             }
         }
     });
