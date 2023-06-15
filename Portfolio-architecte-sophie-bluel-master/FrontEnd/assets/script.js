@@ -62,7 +62,6 @@ function addFilters(filtersName)
             buttonFilter.classList.add('filterselected');
         }
 
-        //const projectPlace = document.querySelectorAll('.gallery')[1];
         const projectPlace = document.getElementById('gallery_home');
 
         //Adding click and sort
@@ -154,7 +153,7 @@ loginSelected.addEventListener('click', () => {
 });
 
 //Add the modale 
-function createModale() 
+function createModalLinks() 
 {
     //Add the button "modifier"
     const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
@@ -162,7 +161,7 @@ function createModale()
     editGallery.appendChild(buttonModify);
 
     buttonModify.outerHTML = `
-        <a href= "#modal-gallery" class = "js-modal">
+        <a class = "js-modal">
             <i class= "fa-regular fa-pen-to-square">
                 <p>modifier</p>
             </i>
@@ -174,7 +173,7 @@ function createModale()
     imagePresentationGallery.appendChild(modifyImagePresentation);
 
     modifyImagePresentation.outerHTML = `
-    <a href= "#modal-gallery" class = "js-modal">
+    <a class = "js-modal">
             <i class= "fa-regular fa-pen-to-square">
                 <p>modifier</p>
             </i>
@@ -186,21 +185,38 @@ function createModale()
     textPresentationGallery.insertAdjacentElement('afterbegin', modifyTextPresentation);
 
     modifyTextPresentation.outerHTML = `
-    <a href= "#modal-gallery" class = "js-modal">
+    <a class = "js-modal">
             <i class= "fa-regular fa-pen-to-square">
                 <p>modifier</p>
             </i>
         </a> 
     `;
+}
+createModalLinks();
 
-    //Add the modal content
-    const displayModal = document.createElement('aside');
-    displayModal.setAttribute('id', 'modal-gallery');
-    displayModal.classList.add("modal");
-    displayModal.style.display ='none';
+function createModal() {
+    const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
 
-    displayModal.innerHTML = `
-    <div class=" modal_content js-modal-stop">
+    let modal = document.createElement('aside');
+    modal.setAttribute('id', 'modal-gallery');
+    modal.classList.add('modal');
+
+    modal.innerHTML = `
+    <div class="modal_content js-modal-stop">
+    </div>
+    `;    
+
+    modal.querySelector(".modal_content").addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    editGallery.appendChild(modal);
+}
+
+function mainModalContent() {
+    let modalContent = document.querySelector('.modal_content');
+
+    modalContent.innerHTML = `
         <button class= "js-modal-close">X</button> 
         <h3>Galerie photo</h3>
         <div class= "gallery gallery_modal"></div>
@@ -209,45 +225,45 @@ function createModale()
             <button class= "button_add-photo">Ajouter une photo</button>
             <button class= "button_delete">Supprimer la galerie</button>
         </div>
-    </div>
-    `;
-    editGallery.appendChild(displayModal);
+    `; 
+    return modalContent;
+}
 
-    //Opening and closing modal function
-    let modal = null;
+function mainModal() {
+    const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
+    const linksModify = document.querySelectorAll('.js-modal');
 
-    const openModal = function (e) {
-        e.preventDefault();
-        modal = document.querySelector(document.querySelector('.js-modal').getAttribute('href'));
-        modal.style.display = null;
-        modal.addEventListener('click', closeModal);
-        modal.querySelector('.js-modal-close').addEventListener('click', closeModal);
-        modal.querySelector('.js-modal-stop').addEventListener('click', stopPropagation);
-    };
-    const closeModal = function (e) {
-        e.preventDefault();
-        modal.style.display = 'none';
-        modal.removeEventListener('click', closeModal);
-        modal.querySelector('.js-modal-close').removeEventListener('click', closeModal);
-        modal.querySelector('.js-modal-stop').removeEventListener('click', stopPropagation);
-        modal = null;
-    }
-    const stopPropagation = function (e) {
-        e.stopPropagation();
-    }
+    //Add the modal content
+    linksModify.forEach(link => link.addEventListener('click', () => {
+        createModal();
 
-    document.querySelectorAll('.js-modal').forEach(a => {
-        a.addEventListener('click', openModal);
-    });
+        let modalContent = mainModalContent();
+        let modal = document.querySelector(".modal");
 
-    //Open the second modal to add photos
-    const addPhoto = document.querySelector('.button_add-photo');
-    addPhoto.addEventListener('click', () => {
-        const reachModalContent = document.querySelector('.modal_content');
-        while (reachModalContent.firstChild) {
-            reachModalContent.firstChild.remove();
-        }
-        reachModalContent.innerHTML = `
+        //Closing modal function
+        modalContent.querySelector('.js-modal-close').addEventListener('click', closeModal);
+        
+        getWorksFromApi().then( () => { 
+            modal.style.display = null;
+        });
+        secondModal();
+    }));
+}
+
+mainModal();
+
+function closeModal(e)
+{
+    let modal = document.querySelector(".modal");
+
+    modal.querySelector('.js-modal-close').removeEventListener('click', closeModal);
+    modal.remove();
+}
+
+function secondModalContent() {
+    let modalContent = document.querySelector('.modal_content');
+
+    modalContent.innerHTML = `
         <button class= "js-arrow"><i class= "fa-solid fa-arrow-left"></i></button>
         <button class= "js-modal-close">X</button> 
         <h3>Ajout photo</h3>
@@ -262,68 +278,157 @@ function createModale()
             <input type="text" id="title"></input>
             <label for="categories">Catégorie</label>
             <select name="categories" id="categories">
-                <option value="option">objets</option>
-                <option value="option">appartements</option>
-                <option value="option">hotelrestaurants</option>
             </select>
         </form>
         <hr>
         <button class="button_validation-photo">Valider</button>
-    </div>
-        `;
-    modal.querySelector('.js-modal-close').addEventListener('click', closeModal); 
-
-    //Clic on arrow the reach the photo gallery modal
-    const arrow = document.querySelector('.js-arrow').addEventListener('click',() => {
-    const modalGallery = document.querySelector('.modal_content');
-    while (modalGallery.firstChild) {
-        modalGallery.firstChild.remove();
-    }
-    modalGallery.outerHTML = `
-    <div class=" modal_content js-modal-stop">
-        <button class= "js-modal-close">X</button> 
-        <h3>Galerie photo</h3>
-        <div class= "gallery gallery_modal"></div>
-        <hr>
-        <div class= "submit_gallery">
-            <button class= "button_add-photo">Ajouter une photo</button>
-            <button class= "button_delete">Supprimer la galerie</button>
-        </div>
-    </div>
     `;
-    }); 
+        
+    return modalContent;
+}
+function secondModal() {
+    //Open the second modal to add photos
+    const addPhoto = document.querySelector('.button_add-photo');
+    const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
 
-    //Open the files to reach images on clic on the button
-    const selectPhoto = document.getElementById('select-photo');
-    selectPhoto.addEventListener('click', () => {
+    addPhoto.addEventListener('click', () => {
+        let modalContent = secondModalContent();
+        modalContent.querySelector('.js-modal-close').addEventListener('click', closeModal); 
+
+        //Clic on arrow the reach the photo gallery modal
+        const arrow = document.querySelector('.js-arrow').addEventListener('click',() => {
+            let modalContent = mainModalContent();
+    
+        //Closing modal function
+        modalContent.querySelector('.js-modal-close').addEventListener('click', closeModal);
+        
+        getWorksFromApi();
+        secondModal();
+        }); 
+
+        //Open the files to reach images on clic on the button
+        const selectPhoto = document.getElementById('select-photo');
+        selectPhoto.addEventListener('click', () => {
+            const photoInput = document.getElementById('photoInput');
+            photoInput.click();
+        });
         const photoInput = document.getElementById('photoInput');
-        photoInput.click();
-    });
-    const photoInput = document.getElementById('photoInput');
-    photoInput.addEventListener('change', function() {
-        const file = photoInput.files[0];
-        const reader = new FileReader();
+        photoInput.addEventListener('change', function() {
+            const file = photoInput.files[0];
+            const reader = new FileReader();
 
-    reader.onload = function(e) {
-        const imageSrc = e.target.result;   //content of the file
-        displayImage(imageSrc);
-    };
+            reader.onload = function(e) {
+                const imageSrc = e.target.result;   //content of the file
+                displayImage(imageSrc);
+            };
 
-    reader.readAsDataURL(file);
-    });
+            reader.readAsDataURL(file);
+        });
 
-    function displayImage(imageSrc) {
-        const newPhoto = document.querySelector('.photo-location');
-        while (newPhoto.firstChild) {
-            newPhoto.firstChild.remove();
-        }
-        const imageElement = document.createElement('img');
-        imageElement.src = imageSrc;
-        newPhoto.appendChild(imageElement);
-    }
+        function displayImage(imageSrc) {
+            const newPhoto = document.querySelector('.photo-location');
+            while (newPhoto.firstChild) {
+                newPhoto.firstChild.remove();
+            }
+            const imageElement = document.createElement('img');
+            imageElement.src = imageSrc;
+            newPhoto.appendChild(imageElement);
+            }
+        //Get categories from the api
+        getCategories();
+
+        //Form submission 
+        let validationButton = document.querySelector('.button_validation-photo');
+        validationButton.addEventListener('click', function(event){
+            event.preventDefault();
+
+            const categories = document.getElementById('categories'); 
+            const selectedCategory = categories.value;
+            console.log(selectedCategory);
+
+            const photoInput = document.querySelector('.photo-location').getElementsByTagName('img');
+
+            const titleInput = document.getElementById('title'); 
+            const enteredTitle = titleInput.value; 
+            console.log(enteredTitle);
+
+            // Create an object json containing the data to send
+            const jsonData = {
+                category: selectedCategory,
+                image: selectedPhoto,
+                title: enteredTitle
+            };
+            postWorkInApi(jsonData);
+        })
     })
 }
-createModale();
+
+
+// POST request
+function postWorkInApi(jsonData) {
+    fetch('http://localhost:5678/api/categories/works', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(jsonData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur lors de la requête POST.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        
+        // Ajouter la nouvelle image à la galerie
+        const gallery = document.querySelectorAll('.gallery');
+
+        gallery.forEach(item => {
+            const image = document.createElement('img');
+            image.src = data.url;
+
+            item.appendChild(image);
+        });
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
+//Get categories of works from the API
+let workCategories = [];
+
+function getCategories() {
+    fetch("http://localhost:5678/api/categories")
+    .then (function(response) { 
+        return response.json();
+    })
+    .then(function(json) {
+        for (let category of json) 
+        {
+            workCategories.push(category.name);
+        }
+        
+        const categoriesSelect = document.getElementById('categories');
+        console.log(categoriesSelect);
+
+        // Add a first empty
+        const emptyOption = document.createElement('option');
+        categoriesSelect.appendChild(emptyOption);
+
+        workCategories.forEach(category => {
+            const option = document.createElement('option');
+            option.textContent = category;
+            categoriesSelect.appendChild(option); 
+        })
+    })
+    .catch(function(error) {
+        console.log(error);
+    })
+}
 
 //Add the black banner when connected
 function topBanner() {
@@ -433,28 +538,38 @@ function modifyImages(ids) {
     });
 }
 
-fetch("http://localhost:5678/api/works")
-.then (function(response) { 
-    return response.json();
-})
-.then(function(json) {
-    for (let object of json) 
-    {
-        displayProject(object.title, object.imageUrl, object.category.name, object.id);
-    }
+function getWorksFromApi() {
+    return new Promise((resolve, reject) => {
+        fetch("http://localhost:5678/api/works")
+        .then (function(response) { 
+            return response.json();
+        })
+        .then(function(json) {
+            for (let object of json) 
+            {
+                displayProject(object.title, object.imageUrl, object.category.name, object.id);
+            }
 
-    let namesFilter = json.map(object => object.category.name); //Return the value of filters's name as a list
+            let namesFilter = json.map(object => object.category.name); //Return the value of filters's name as a list
 
-    let uniqueFilter = Array.from(new Set(namesFilter)); //Sort and store unique values ​​+ return an array
-    uniqueFilter.unshift("Tous");
+            let uniqueFilter = Array.from(new Set(namesFilter)); //Sort and store unique values ​​+ return an array
+            uniqueFilter.unshift("Tous");
 
-    let imagesId = json.map(image => image.id); //Return the value of id's images
+            let imagesId = json.map(image => image.id); //Return the value of id's images
 
-    addFilters(uniqueFilter);
-    adminMode(!userLogged); 
-    updateModale();
-    modifyImages(imagesId);
-})
-.catch(function(error) {
-    console.log(error)
-});
+            addFilters(uniqueFilter);
+            adminMode(!userLogged); 
+
+            updateModale();
+            modifyImages(imagesId);
+
+            resolve();
+        })
+        .catch(function(error) {
+            console.log(error);
+            reject(error);
+        });
+    });
+}
+
+getWorksFromApi();

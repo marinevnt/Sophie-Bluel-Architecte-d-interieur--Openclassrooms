@@ -426,12 +426,15 @@ form {
     font-weight: 500;
     margin-bottom: 10px;
 }
-.modal-addPhoto input {
+.modal-addPhoto input, #categories{
 	height: 50px;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
     border: none;
 	margin-bottom: 20px;
 	font-family: 'Work Sans';
+}
+#title, #categories {
+	padding-left: 20px;
 }
 .button_validation-photo {
 	font-size: 17px;
