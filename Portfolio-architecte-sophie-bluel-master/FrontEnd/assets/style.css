@@ -443,6 +443,11 @@ form {
     color: white;
     width: 240px;
     height: 40px;
+	pointer-events: none;
+}
+.button_validation-photo--green {
+	background-color: #1D6154;
+	pointer-events: auto;
 }
 
 /*Bannière noire*/

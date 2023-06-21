@@ -1,43 +1,47 @@
-let token;
-//Recover photos
-const loginUrl = "login.html";
-
-const loginSelected = document.getElementById('buttonlogin');
-
-//The user is not logged yet
-let userLogged = false;
-
-function displayProject(title, imageUrl, filter, id)
-{
+/**
+ * Recover a project and display it
+ * @param {string} title 
+ * @param {string} imageUrl 
+ * @param {string} filter 
+ * @param {number} id 
+ */
+function displayProjects(projects) {
     const galleryApi = document.querySelectorAll(".gallery");
+    galleryApi.forEach(gallery => gallery.innerHTML = "");
 
-    galleryApi.forEach(gallery => {
-        // Create HTML element for images
-        const figure = document.createElement("figure");
-        const image = document.createElement("img");
-        const figureCaption = document.createElement("figcaption");
+    for(let i = 0; i < projects.length; i++)
+    {
+        galleryApi.forEach(gallery => {
+            // Create HTML element for images
+            const figure = document.createElement("figure");
+            const image = document.createElement("img");
+            const figureCaption = document.createElement("figcaption");
 
-        //Create class for figures 
-        filter = filter.replace(/\s+/g, '').replace("&", "");
-        figure.classList.add(filter);
+            //Create class for figures 
+            let filter = projects[i].category.name.replace(/\s+/g, '').replace("&", "");
+            figure.classList.add(filter);
 
-        //Create id for figures
-        figure.classList.add("figure" + id);
+            //Create id for figures
+            figure.classList.add("figure" + projects[i].id);
 
-        // Create hierarchy
-        figure.appendChild(image);
-        figure.appendChild(figureCaption);
+            // Create hierarchy
+            figure.appendChild(image);
+            figure.appendChild(figureCaption);
 
-        gallery.appendChild(figure);
+            gallery.appendChild(figure);
 
-        // give an image and a title to the created elements
-        image.setAttribute("src", imageUrl);
-        figureCaption.innerText = title;
-    });
+            // give an image and a title to the created elements
+            image.setAttribute("src", projects[i].imageUrl);
+            figureCaption.innerText = projects[i].title;
+        });
+    }
 }
 
-function addFilters(filtersName)
-{
+/**
+ * Add filters and sort projects on button click
+ * @param {string} filtersName 
+ */
+function displayFilters(filtersName) {
     //Creation and position of the div containing buttons
     const filter = document.getElementById("portfolio");
     const positionInId = filter.getElementsByTagName("h2")[0];
@@ -57,8 +61,7 @@ function addFilters(filtersName)
         buttonFilter.innerText = buttonText;
 
         //Adding filter on the main button
-        if(i === 0)
-        {
+        if(i === 0) {
             buttonFilter.classList.add('filterselected');
         }
 
@@ -99,62 +102,46 @@ function addFilters(filtersName)
     }
 }
 
-//Remove filters when login and add modal
-function adminMode(isAdmin)
-{
-    const hideFilters = document.querySelector('.buttonfilter');
-    const displayModal = document.querySelectorAll('.js-modal');
+/**
+ * Adapt the user interface with filters, banner, buttons modify when login or logout
+ * @param {Boolean} isConnected 
+ */
+function updateUIOnAuthChanged(isConnected) {
+    const filtersButton = document.querySelector('.buttonfilter');
+    const modifyButtons = document.querySelectorAll('.js-modal');
     const bodyBanner = document.querySelector('.banner');
+    const buttonLogin = document.getElementById('buttonlogin');
 
-    if(isAdmin)
+    if(isConnected)
     {
-        hideFilters.style.display = "flex";
-        displayModal.forEach(modal => {modal.style.display = "none"});
-        bodyBanner.style.display = "none";
+        buttonLogin.innerText = 'logout';
+        bodyBanner.style.display = "flex";
+        filtersButton.style.display = "none";
+        modifyButtons.forEach(modifyButton => {modifyButton.style.display = "inline"});
+        createModalLinks();
     }
     else
     {
-        hideFilters.style.display = "none";
-        displayModal.forEach(modal => {modal.style.display = "inline"});
-        bodyBanner.style.display = "flex";
+        filtersButton.style.display = "flex";
+        bodyBanner.style.display = "none";
+        buttonLogin.innerText = 'login';
+        modifyButtons.forEach(modifyButton => {modifyButton.style.display = "none"});
     }
 }
 
-//Display login or logout
-function isLogged() 
-{
-    token = localStorage.getItem("token");
+/**
+ * Check if the user is connected
+ * @returns true if connected, false if not
+ */
+function isLogged() {
+    let token = localStorage.getItem("token");
+    return [Boolean(token), token]; //If undefined, null return false, else return true
+}
 
-    userLogged = Boolean(token); //If undefined, null return false, else return true
- 
-    //if connected, write logout
-    if (userLogged) {
-        loginSelected.innerText = 'logout';
-    }
-    //if deconnected, write login
-    else {
-        loginSelected.innerText = 'login';
-    }
-};
-
-isLogged();
-
-//AddEventListener to remove the token and deconect 
-loginSelected.addEventListener('click', () => {
-    if (loginSelected.innerText === 'logout') {
-        localStorage.removeItem("token");
-        isLogged();
-        adminMode(true);
-    }
-    else
-    {
-        window.location.href = loginUrl;
-    }
-});
-
-//Add the modale 
-function createModalLinks() 
-{
+/**
+ * Create and place the 3 links of modify button
+ */
+function createModalLinks() {
     //Add the button "modifier"
     const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
     const buttonModify = document.createElement('a');
@@ -191,9 +178,13 @@ function createModalLinks()
             </i>
         </a> 
     `;
-}
-createModalLinks();
 
+    addModalEventListener();
+}
+
+/**
+ * Create the structure of the modal with <aside> and <div>
+ */
 function createModal() {
     const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
 
@@ -213,6 +204,10 @@ function createModal() {
     editGallery.appendChild(modal);
 }
 
+/**
+ * Create the content of the first modal
+ * @returns modalContent
+ */
 function mainModalContent() {
     let modalContent = document.querySelector('.modal_content');
 
@@ -229,12 +224,15 @@ function mainModalContent() {
     return modalContent;
 }
 
-function mainModal() {
+/**
+ *  Add eventListener on the button modifier to open and close the modal
+ */
+function addModalEventListener() {
     const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
     const linksModify = document.querySelectorAll('.js-modal');
 
     //Add the modal content
-    linksModify.forEach(link => link.addEventListener('click', () => {
+    linksModify.forEach(link => link.addEventListener('click', async () => {
         createModal();
 
         let modalContent = mainModalContent();
@@ -243,23 +241,30 @@ function mainModal() {
         //Closing modal function
         modalContent.querySelector('.js-modal-close').addEventListener('click', closeModal);
         
-        getWorksFromApi().then( () => { 
-            modal.style.display = null;
-        });
+        let works = await getWorksFromApi();
+        displayProjects(works);
+        updateModal();
+        modifyImages(works.map(work => {return work.id}));
+        modal.style.display = null;
+        
         secondModal();
     }));
 }
 
-mainModal();
-
-function closeModal(e)
-{
+/**
+ * Remove the eventListener to close the modal
+ */
+function closeModal() {
     let modal = document.querySelector(".modal");
 
     modal.querySelector('.js-modal-close').removeEventListener('click', closeModal);
     modal.remove();
 }
 
+/**
+ * Create the content of the second modal
+ * @returns modalContent
+ */
 function secondModalContent() {
     let modalContent = document.querySelector('.modal_content');
 
@@ -270,167 +275,253 @@ function secondModalContent() {
         <form class= "modal-addPhoto">
             <div class="photo-location">
                 <i class="fa-regular fa-image"></i>
-                <input type="file" id="photoInput" accept="image/jpeg, image/png" style="display: none">
+                <input name="image" type="file" id="photoInput" accept="image/jpeg, image/png" style="display: none">
                 <label id="select-photo">+ Ajouter photo</label>
                 <p>jpg, png : 4mo max</p>
             </div>
             <label for="title">Titre</label>
-            <input type="text" id="title"></input>
+            <input name ="title" type="text" id="title"></input>
             <label for="categories">Catégorie</label>
-            <select name="categories" id="categories">
+            <select name="category" id="categories">
             </select>
         </form>
         <hr>
-        <button class="button_validation-photo">Valider</button>
+        <button type="submit" class="button_validation-photo">Valider</button>
     `;
         
     return modalContent;
 }
+
+/**
+ * Open the second modal and make it functional
+ */
 function secondModal() {
     //Open the second modal to add photos
     const addPhoto = document.querySelector('.button_add-photo');
     const editGallery = document.getElementById('portfolio').getElementsByTagName('h2')[0];
 
-    addPhoto.addEventListener('click', () => {
+    addPhoto.addEventListener('click', async () => {
         let modalContent = secondModalContent();
         modalContent.querySelector('.js-modal-close').addEventListener('click', closeModal); 
 
         //Clic on arrow the reach the photo gallery modal
-        const arrow = document.querySelector('.js-arrow').addEventListener('click',() => {
+        const arrow = document.querySelector('.js-arrow').addEventListener('click',async () => {
             let modalContent = mainModalContent();
     
-        //Closing modal function
-        modalContent.querySelector('.js-modal-close').addEventListener('click', closeModal);
-        
-        getWorksFromApi();
-        secondModal();
+            //Closing modal function
+            modalContent.querySelector('.js-modal-close').addEventListener('click', closeModal);
+            
+            let works = await getWorksFromApi();
+            displayProjects(works);
+            updateModal();
+            modifyImages(works.map(work => {return work.id}));
+
+            secondModal();
         }); 
 
-        //Open the files to reach images on clic on the button
-        const selectPhoto = document.getElementById('select-photo');
-        selectPhoto.addEventListener('click', () => {
-            const photoInput = document.getElementById('photoInput');
-            photoInput.click();
-        });
-        const photoInput = document.getElementById('photoInput');
-        photoInput.addEventListener('change', function() {
-            const file = photoInput.files[0];
-            const reader = new FileReader();
+        ReachimagesForModal();
 
-            reader.onload = function(e) {
-                const imageSrc = e.target.result;   //content of the file
-                displayImage(imageSrc);
-            };
+        //Get categories of works from the API
+        let workCategories = await getCategoriesFromApi();
+        displayCategories(workCategories);
 
-            reader.readAsDataURL(file);
-        });
-
-        function displayImage(imageSrc) {
-            const newPhoto = document.querySelector('.photo-location');
-            while (newPhoto.firstChild) {
-                newPhoto.firstChild.remove();
-            }
-            const imageElement = document.createElement('img');
-            imageElement.src = imageSrc;
-            newPhoto.appendChild(imageElement);
-            }
-        //Get categories from the api
-        getCategories();
-
-        //Form submission 
-        let validationButton = document.querySelector('.button_validation-photo');
-        validationButton.addEventListener('click', function(event){
-            event.preventDefault();
-
-            const categories = document.getElementById('categories'); 
-            const selectedCategory = categories.value;
-            console.log(selectedCategory);
-
-            const photoInput = document.querySelector('.photo-location').getElementsByTagName('img');
-
-            const titleInput = document.getElementById('title'); 
-            const enteredTitle = titleInput.value; 
-            console.log(enteredTitle);
-
-            // Create an object json containing the data to send
-            const jsonData = {
-                category: selectedCategory,
-                image: selectedPhoto,
-                title: enteredTitle
-            };
-            postWorkInApi(jsonData);
-        })
+        submissionOfTheForm();
     })
 }
+/**
+ * Select photo on file with an addEventListener on button add photo
+ */
+function ReachimagesForModal() {
+    //Open the files to reach images on clic on the button
+    const selectPhoto = document.getElementById('select-photo');
+    selectPhoto.addEventListener('click', () => {
+        const photoInput = document.getElementById('photoInput');
+        photoInput.click();
+    });
+    const photoInput = document.getElementById('photoInput');
+    photoInput.addEventListener('change', function() {
+        const file = photoInput.files[0];
+        const reader = new FileReader();
 
+        reader.onload = function(e) {
+            const imageSrc = e.target.result;   //content of the file
+            displayImage(imageSrc);
+        };
 
-// POST request
-function postWorkInApi(jsonData) {
-    fetch('http://localhost:5678/api/categories/works', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(jsonData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erreur lors de la requête POST.');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data);
-        
-        // Ajouter la nouvelle image à la galerie
-        const gallery = document.querySelectorAll('.gallery');
-
-        gallery.forEach(item => {
-            const image = document.createElement('img');
-            image.src = data.url;
-
-            item.appendChild(image);
-        });
-    })
-    .catch(error => {
-        console.error(error);
+        reader.readAsDataURL(file);
     });
 }
 
-//Get categories of works from the API
-let workCategories = [];
+/**
+ * Add the photo on the modal
+ * @param {string} imageSrc 
+ */
+function displayImage(imageSrc) {
+    const newPhoto = document.querySelector('.photo-location');
+    let children = newPhoto.children;
 
-function getCategories() {
-    fetch("http://localhost:5678/api/categories")
-    .then (function(response) { 
-        return response.json();
-    })
-    .then(function(json) {
-        for (let category of json) 
+    for (let i = 0; i < children.length; i++) {
+        children[i].style.visibility = 'hidden';
+        children[i].style.display = 'none';
+    }
+
+    const imageElement = document.createElement('img');
+    imageElement.src = imageSrc;
+    newPhoto.appendChild(imageElement);
+    }
+
+/**
+ * Allow the form submission
+ */
+function submissionOfTheForm() {
+    let form = document.querySelector('.modal-addPhoto');
+    let buttonForm = document.querySelector('.button_validation-photo');
+
+    form.addEventListener('input', () => {
+        if( handleForm() !== null) 
         {
-            workCategories.push(category.name);
+            console.log("handleForm !== null");
+            buttonForm.classList.add('button_validation-photo--green');
         }
-        
-        const categoriesSelect = document.getElementById('categories');
-        console.log(categoriesSelect);
-
-        // Add a first empty
-        const emptyOption = document.createElement('option');
-        categoriesSelect.appendChild(emptyOption);
-
-        workCategories.forEach(category => {
-            const option = document.createElement('option');
-            option.textContent = category;
-            categoriesSelect.appendChild(option); 
-        })
+        else 
+        {    
+            console.log("handleForm === null");
+            buttonForm.classList.remove('button_validation-photo--green');
+        }
     })
-    .catch(function(error) {
-        console.log(error);
+
+    buttonForm.addEventListener('click', async function(event) {
+        event.preventDefault();
+
+        console.log(buttonForm);
+        let formData = handleForm(); //Récupérer les données du formulaire
+
+        if(formData !== null) {
+            let modalContent = mainModalContent();
+        
+            //Closing modal function
+            modalContent.querySelector('.js-modal-close').addEventListener('click', closeModal);
+            
+            await postWorkInApi(formData);
+    
+            let works = await getWorksFromApi();
+            displayProjects(works);
+
+            updateModal();
+            modifyImages(works.map(work => {return work.id}));
+
+            secondModal();
+        }
+        else {
+            alert("Veuillez remplir tous les champs du formulaire.");
+            return;
+        }
     })
 }
 
-//Add the black banner when connected
+function handleForm() {
+    // Récupérer les valeurs des champs
+    let imageInput = document.getElementById('photoInput');
+    let titleInput = document.getElementById('title');
+    let categoryInput = document.getElementById('categories');
+
+    // Créer un nouvel objet FormData
+    let formData = new FormData();
+
+    // Ajouter l'image sous forme de chaîne binaire
+    let imageFile = imageInput.files[0];
+    if(imageFile === undefined)
+    {
+        return null;
+    }
+    formData.append('image', imageFile); 
+
+    // Récupérer le titre sous forme de chaîne de caractères
+    let title = titleInput.value;
+    if(title === "")
+    {
+        return null;
+    }
+    formData.append('title', title); 
+
+
+    // Récupérer la catégorie sous forme d'entier
+    let category = categoryInput.value;
+    if(category === "")
+    {
+        return null;
+    }
+    formData.append('category', category);
+
+    return formData;
+}
+
+
+/**
+ * Post request to add a photo in Api and gallery
+ * @param {string} formData 
+ */
+async function postWorkInApi(formData) {
+    let response = await fetch('http://localhost:5678/api/works', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: formData
+    })
+
+    if (!response.ok) {
+        throw new Error('Erreur lors de la requête POST.');
+    }
+}
+
+/**
+ * Get categories from the Api
+ * @returns Array workCategories
+ */
+async function getCategoriesFromApi() {
+    let workCategories = [];
+
+    try {
+        const response = await fetch("http://localhost:5678/api/categories");
+        const json = await response.json();
+
+        for (let category of json) 
+        {
+            workCategories.push({name: category.name, id: category.id});
+        }
+
+        return workCategories;
+    } 
+    catch(error)
+    {
+        console.log(error);
+    }
+}
+
+/**
+ * Display categories in form
+ * @param {string} categories 
+ */
+function displayCategories(categories) {
+    const categoriesSelect = document.getElementById('categories');
+    console.log(categoriesSelect);
+
+    // Add a first empty
+    const emptyOption = document.createElement('option');
+    emptyOption.hidden = true;
+    categoriesSelect.appendChild(emptyOption);
+
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        categoriesSelect.appendChild(option); 
+    })
+}
+/**
+ * Creation of the black banner 
+ */
 function topBanner() {
     const bannerPosition = document.querySelector('body');
     const banner = document.createElement('div');
@@ -448,9 +539,10 @@ function topBanner() {
     </div>
     `;
 }
-topBanner();
-
-function updateModale() 
+ /**
+  * Add the icon trash in the gallery modal and change the title of images
+  */
+function updateModal() 
 {
     const figuresInGalleryModal = document.querySelector('.gallery_modal').getElementsByTagName('figure');
     const textGalleryModale = document.querySelector('.gallery_modal').getElementsByTagName('figcaption');
@@ -475,7 +567,10 @@ function updateModale()
     }
 }
 
-//Delete image when clic on trash
+/**
+ * Delete image when clic on trash and delete all images when clic on the button
+ * @param {number} ids 
+ */
 function modifyImages(ids) {
     const trashes = document.querySelectorAll('.button_trash');
     const deleteAll = document.querySelector('.button_delete');
@@ -484,9 +579,9 @@ function modifyImages(ids) {
         let trash = trashes[i];
         let imageId = ids[i];  
 
-        console.log(token);
         trash.addEventListener('click', event => {
             // Request DELETE to the API
+
             fetch(`http://localhost:5678/api/works/${imageId}`, {
                 method: 'DELETE',
                 headers: {
@@ -496,8 +591,8 @@ function modifyImages(ids) {
             .then(function(response) {
                 if (response.ok) {
                     // Remove the project from the gallery
-                    let figure = document.querySelector(".figure" + imageId);
-                    figure.remove();
+                    let figures = document.querySelectorAll(".figure" + imageId);
+                    figures.forEach(figure => figure.remove());
                 } else {
                     console.error('Erreur lors de la suppression')
                 }
@@ -538,38 +633,66 @@ function modifyImages(ids) {
     });
 }
 
-function getWorksFromApi() {
-    return new Promise((resolve, reject) => {
-        fetch("http://localhost:5678/api/works")
-        .then (function(response) { 
-            return response.json();
-        })
-        .then(function(json) {
-            for (let object of json) 
-            {
-                displayProject(object.title, object.imageUrl, object.category.name, object.id);
-            }
+/**
+ * Get title, imageUrl, category and id from the API
+ * @returns Array
+ */
+async function getWorksFromApi() {
+    try {
+        const response = await fetch("http://localhost:5678/api/works");
+        const json = await response.json();
 
-            let namesFilter = json.map(object => object.category.name); //Return the value of filters's name as a list
+        let projects = []; 
+        console.log(projects);
+        for (let object of json) 
+        {
+            projects.push({
+                title:object.title,
+                imageUrl:object.imageUrl,
+                category: object.category,
+                id: object.id
+            });
+        }
 
-            let uniqueFilter = Array.from(new Set(namesFilter)); //Sort and store unique values ​​+ return an array
-            uniqueFilter.unshift("Tous");
-
-            let imagesId = json.map(image => image.id); //Return the value of id's images
-
-            addFilters(uniqueFilter);
-            adminMode(!userLogged); 
-
-            updateModale();
-            modifyImages(imagesId);
-
-            resolve();
-        })
-        .catch(function(error) {
-            console.log(error);
-            reject(error);
-        });
-    });
+        return projects;
+    }
+    catch(error) {
+        console.log(error);
+    };
 }
 
-getWorksFromApi();
+//EXECUTIF
+let token = localStorage.getItem("token");
+
+//Recover photos
+const loginUrl = "login.html";
+const loginSelected = document.getElementById('buttonlogin');
+
+topBanner();
+
+//Check if the user is logged
+[userLogged, token] = isLogged();
+
+//AddEventListener to remove the token and deconnect 
+loginSelected.addEventListener('click', () => {
+    if (userLogged) {
+        localStorage.removeItem("token");
+        userLogged = false;
+        updateUIOnAuthChanged(userLogged);
+    }
+    else
+    {
+        window.location.href = loginUrl;
+    }
+});
+
+(async () => {
+    let works = await getWorksFromApi();
+    displayProjects(works);
+    
+    let filters = await getCategoriesFromApi();
+    displayFilters(["Tous", ...filters.map(category => {return category.name})]);
+    
+
+    updateUIOnAuthChanged(userLogged);
+})();
