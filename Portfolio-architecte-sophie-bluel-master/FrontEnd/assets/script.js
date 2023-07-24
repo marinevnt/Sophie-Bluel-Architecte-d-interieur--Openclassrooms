@@ -106,11 +106,15 @@ function displayFilters(filtersName) {
  * Adapt the user interface with filters, banner, buttons modify when login or logout
  * @param {Boolean} isConnected 
  */
-function updateUIOnAuthChanged(isConnected) {
-    const filtersButton = document.querySelector('.buttonfilter');
+async function updateUIOnAuthChanged(isConnected) {
     const modifyButtons = document.querySelectorAll('.js-modal');
     const bodyBanner = document.querySelector('.banner');
     const buttonLogin = document.getElementById('buttonlogin');
+
+    let filters = await getCategoriesFromApi();
+    displayFilters(["Tous", ...filters.map(category => {return category.name})]);
+
+    const filtersButton = document.querySelector('.buttonfilter');
 
     if(isConnected)
     {
@@ -135,7 +139,7 @@ function updateUIOnAuthChanged(isConnected) {
  */
 function isLogged() {
     let token = localStorage.getItem("token");
-    return [Boolean(token), token]; //If undefined, null return false, else return true
+    return [Boolean(token), token]; //Return an array, if undefined, null return false, else return true
 }
 
 /**
@@ -380,12 +384,10 @@ function submissionOfTheForm() {
     form.addEventListener('input', () => {
         if( handleForm() !== null) 
         {
-            console.log("handleForm !== null");
             buttonForm.classList.add('button_validation-photo--green');
         }
         else 
         {    
-            console.log("handleForm === null");
             buttonForm.classList.remove('button_validation-photo--green');
         }
     })
@@ -393,8 +395,7 @@ function submissionOfTheForm() {
     buttonForm.addEventListener('click', async function(event) {
         event.preventDefault();
 
-        console.log(buttonForm);
-        let formData = handleForm(); //Récupérer les données du formulaire
+        let formData = handleForm(); //Get form data
 
         if(formData !== null) {
             let modalContent = mainModalContent();
@@ -419,16 +420,20 @@ function submissionOfTheForm() {
     })
 }
 
+/**
+ * Retrieve data of the form (image, title and category) and check if inputs are filled in
+ * @returns formData object if all inputs are filled, or null if any input is missing.
+ */
 function handleForm() {
-    // Récupérer les valeurs des champs
+    // Get inputs values 
     let imageInput = document.getElementById('photoInput');
     let titleInput = document.getElementById('title');
     let categoryInput = document.getElementById('categories');
 
-    // Créer un nouvel objet FormData
+    // Create a new FormData object
     let formData = new FormData();
 
-    // Ajouter l'image sous forme de chaîne binaire
+    // Add the image
     let imageFile = imageInput.files[0];
     if(imageFile === undefined)
     {
@@ -436,7 +441,7 @@ function handleForm() {
     }
     formData.append('image', imageFile); 
 
-    // Récupérer le titre sous forme de chaîne de caractères
+    // Get the title
     let title = titleInput.value;
     if(title === "")
     {
@@ -444,8 +449,7 @@ function handleForm() {
     }
     formData.append('title', title); 
 
-
-    // Récupérer la catégorie sous forme d'entier
+    // Get the category
     let category = categoryInput.value;
     if(category === "")
     {
@@ -505,7 +509,6 @@ async function getCategoriesFromApi() {
  */
 function displayCategories(categories) {
     const categoriesSelect = document.getElementById('categories');
-    console.log(categoriesSelect);
 
     // Add a first empty
     const emptyOption = document.createElement('option');
@@ -643,7 +646,6 @@ async function getWorksFromApi() {
         const json = await response.json();
 
         let projects = []; 
-        console.log(projects);
         for (let object of json) 
         {
             projects.push({
@@ -686,13 +688,11 @@ loginSelected.addEventListener('click', () => {
     }
 });
 
+console.log(userLogged);
+
 (async () => {
     let works = await getWorksFromApi();
     displayProjects(works);
-    
-    let filters = await getCategoriesFromApi();
-    displayFilters(["Tous", ...filters.map(category => {return category.name})]);
-    
 
     updateUIOnAuthChanged(userLogged);
 })();
